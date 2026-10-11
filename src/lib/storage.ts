@@ -5,9 +5,6 @@ import {
   Budget,
   Commitment,
   FinanceState,
-  RiskLevel,
-  Category,
-  CATEGORIES,
 } from '@/types';
 
 const STORAGE_KEY = 'pennypilot_state_v1';
@@ -105,7 +102,7 @@ export function createInitialCommitments(): Commitment[] {
   ];
 }
 
-export function createInitialTransactions(startingBudget: number): Transaction[] {
+export function createInitialTransactions(): Transaction[] {
   const today = new Date();
   const isoDate = (d: number) => {
     const date = new Date(today);
@@ -134,7 +131,7 @@ export function createDefaultState(): FinanceState {
   return {
     startDate,
     startingBudget: 10000,
-    transactions: createInitialTransactions(10000),
+    transactions: createInitialTransactions(),
     savingsGoals: createInitialSavingsGoals(),
     subscriptions: createInitialSubscriptions(),
     budgets: createInitialBudgets(),

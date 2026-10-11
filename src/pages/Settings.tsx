@@ -6,6 +6,7 @@ import { PageHeader } from '@/pages/Analytics';
 import { formatCurrency } from '@/lib/finance';
 import { CalendarClock, Check, Trash2, Plus, Settings as SettingsIcon } from 'lucide-react';
 import { Commitment, Category, CATEGORIES } from '@/types';
+import { ConfirmDialog } from '@/components/ui/ConfirmDialog';
 
 export function Settings() {
   const { state, metrics, currentDay, resetData, updateSettings, toggleCommitmentPaid, addCommitment, deleteCommitment } = useFinance();
@@ -15,6 +16,7 @@ export function Settings() {
   const [currencySymbol, setCurrencySymbol] = useState(state.currency);
   const [commitmentModalOpen, setCommitmentModalOpen] = useState(false);
   const [resetModalOpen, setResetModalOpen] = useState(false);
+  const [deleteCommitmentItem, setDeleteCommitmentItem] = useState<Commitment | null>(null);
 
   const handleSaveSettings = () => {
     updateSettings({ userName: userName.trim() || 'Explorer', currency: currencySymbol });
@@ -120,8 +122,9 @@ export function Settings() {
                       {formatCurrency(c.amount, currency)}
                     </span>
                     <button
-                      onClick={() => deleteCommitment(c.id)}
+                      onClick={() => setDeleteCommitmentItem(c)}
                       className="w-7 h-7 rounded-lg flex items-center justify-center text-navy-400 hover:text-red-400 hover:bg-white/[0.05] transition-all opacity-0 group-hover:opacity-100"
+                      aria-label="Delete commitment"
                     >
                       <Trash2 size={14} />
                     </button>
@@ -199,6 +202,15 @@ export function Settings() {
           </button>
         </div>
       </Modal>
+
+      <ConfirmDialog
+        open={!!deleteCommitmentItem}
+        onClose={() => setDeleteCommitmentItem(null)}
+        onConfirm={() => { if (deleteCommitmentItem) deleteCommitment(deleteCommitmentItem.id); }}
+        title="Delete Commitment"
+        message={`Delete "${deleteCommitmentItem?.name || ''}"? This cannot be undone.`}
+        confirmLabel="Delete"
+      />
 
       {/* Add Commitment Modal */}
       <CommitmentFormModal

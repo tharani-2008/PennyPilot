@@ -98,24 +98,30 @@ export function FinanceProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const contributeToGoal = useCallback((id: string, amount: number) => {
-    setState((prev) => ({
-      ...prev,
-      savingsGoals: prev.savingsGoals.map((g) =>
-        g.id === id ? { ...g, currentAmount: Math.min(g.targetAmount, g.currentAmount + amount) } : g
-      ),
-      transactions: [
-        ...prev.transactions,
-        {
-          id: generateId(),
-          type: 'expense' as const,
-          amount,
-          category: 'Other' as const,
-          description: `Savings: ${prev.savingsGoals.find((g) => g.id === id)?.name || 'Goal'}`,
-          date: new Date().toISOString().split('T')[0],
-          day: getDayNumber(prev.startDate),
-        },
-      ],
-    }));
+    setState((prev) => {
+      const goal = prev.savingsGoals.find((g) => g.id === id);
+      if (!goal) return prev;
+      const actualAmount = Math.min(amount, goal.targetAmount - goal.currentAmount);
+      if (actualAmount <= 0) return prev;
+      return {
+        ...prev,
+        savingsGoals: prev.savingsGoals.map((g) =>
+          g.id === id ? { ...g, currentAmount: g.currentAmount + actualAmount } : g
+        ),
+        transactions: [
+          ...prev.transactions,
+          {
+            id: generateId(),
+            type: 'expense' as const,
+            amount: actualAmount,
+            category: 'Other' as const,
+            description: `Savings: ${goal.name}`,
+            date: new Date().toISOString().split('T')[0],
+            day: getDayNumber(prev.startDate),
+          },
+        ],
+      };
+    });
   }, []);
 
   const addSubscription = useCallback((sub: Omit<Subscription, 'id'>) => {

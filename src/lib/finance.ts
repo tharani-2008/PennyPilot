@@ -1,9 +1,6 @@
 import {
   Transaction,
-  SavingsGoal,
-  Subscription,
   Budget,
-  Commitment,
   FinanceState,
   RiskLevel,
   Category,
@@ -102,7 +99,8 @@ export function calculateMetrics(state: FinanceState, currentDay: number): Finan
 
   const spendRate = currentDay > 0 ? totalSpending / currentDay : 0;
 
-  const burnRate = (totalSpending / (startingBudget + totalIncome)) * 100;
+  const totalAvailable = startingBudget + totalIncome;
+  const burnRate = totalAvailable > 0 ? (totalSpending / totalAvailable) * 100 : 0;
 
   const healthScore = calculateHealthScore({
     remainingBalance,
@@ -130,7 +128,6 @@ export function calculateMetrics(state: FinanceState, currentDay: number): Finan
     projectedEndBalance,
     safeToSpend,
     spendRate,
-    currentDay,
     totalSpending,
     totalIncome,
     savingsProgress: totalSavingsProgress,
@@ -183,7 +180,7 @@ function calculateHealthScore(params: {
   const { remainingBalance, startingBudget, totalSpending, totalIncome, currentDay, savingsProgress, unpaidCommitments, projectedEndBalance } = params;
 
   const totalAvailable = startingBudget + totalIncome;
-  const spentPercentage = (totalSpending / totalAvailable) * 100;
+  const spentPercentage = totalAvailable > 0 ? (totalSpending / totalAvailable) * 100 : 0;
   const expectedSpendByNow = (currentDay / 30) * 100;
 
   if (spentPercentage > expectedSpendByNow) {
@@ -307,7 +304,6 @@ function generateInsights(params: {
   projectedEndBalance: number;
   safeToSpend: number;
   spendRate: number;
-  currentDay: number;
   totalSpending: number;
   totalIncome: number;
   savingsProgress: number;
@@ -323,7 +319,6 @@ function generateInsights(params: {
     projectedEndBalance,
     safeToSpend,
     spendRate,
-    currentDay,
     totalSpending,
     totalIncome,
     savingsProgress,
@@ -421,12 +416,12 @@ function generateInsights(params: {
     });
   }
 
-  if (unpaidCommitments > remainingBalance * 0.4 && unpaidCommitments > 0) {
+  if (unpaidCommitments > remainingBalance * 0.4 && unpaidCommitments > 0 && remainingBalance > 0) {
     insights.push({
       id: 'commitments-risk',
       type: 'warning',
       title: 'Upcoming commitments could strain your balance',
-      message: `${formatInsightCurrency(unpaidCommitments, currency)} in unpaid commitments is ${((unpaidCommitments / remainingBalance) * 100).toFixed(0)}% of your remaining balance.`,
+      message: `${formatInsightCurrency(unpaidCommitments, currency)} in unpaid commitments is ${remainingBalance > 0 ? ((unpaidCommitments / remainingBalance) * 100).toFixed(0) : '100+'}% of your remaining balance.`,
       icon: 'CalendarClock',
     });
   }

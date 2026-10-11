@@ -8,6 +8,7 @@ import { PageHeader } from '@/pages/Analytics';
 import { formatCurrency } from '@/lib/finance';
 import { CATEGORY_META, Category, CATEGORIES, Budget } from '@/types';
 import { Plus, Trash2, Edit, PiggyBank, AlertCircle } from 'lucide-react';
+import { ConfirmDialog } from '@/components/ui/ConfirmDialog';
 
 export function Budgets() {
   const { state, metrics, addBudget, updateBudget, deleteBudget } = useFinance();
@@ -15,6 +16,7 @@ export function Budgets() {
 
   const [modalOpen, setModalOpen] = useState(false);
   const [editBudget, setEditBudget] = useState<Budget | null>(null);
+  const [deleteBudgetItem, setDeleteBudgetItem] = useState<Budget | null>(null);
 
   const usedCategories = state.budgets.map((b) => b.category);
   const availableCategories = CATEGORIES.filter((c) => !usedCategories.includes(c));
@@ -76,10 +78,10 @@ export function Budgets() {
                     </div>
                   </div>
                   <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                    <button onClick={() => openEdit(state.budgets.find((b) => b.category === bs.category)!)} className="w-7 h-7 rounded-lg flex items-center justify-center text-navy-400 hover:text-lime-400 hover:bg-white/[0.05] transition-all">
+                    <button onClick={() => openEdit(state.budgets.find((b) => b.category === bs.category)!)} className="w-7 h-7 rounded-lg flex items-center justify-center text-navy-400 hover:text-lime-400 hover:bg-white/[0.05] transition-all" aria-label="Edit budget">
                       <Edit size={14} />
                     </button>
-                    <button onClick={() => deleteBudget(state.budgets.find((b) => b.category === bs.category)!.id)} className="w-7 h-7 rounded-lg flex items-center justify-center text-navy-400 hover:text-red-400 hover:bg-white/[0.05] transition-all">
+                    <button onClick={() => setDeleteBudgetItem(state.budgets.find((b) => b.category === bs.category) || null)} className="w-7 h-7 rounded-lg flex items-center justify-center text-navy-400 hover:text-red-400 hover:bg-white/[0.05] transition-all" aria-label="Delete budget">
                       <Trash2 size={14} />
                     </button>
                   </div>
@@ -121,6 +123,15 @@ export function Budgets() {
           }
           setModalOpen(false);
         }}
+      />
+
+      <ConfirmDialog
+        open={!!deleteBudgetItem}
+        onClose={() => setDeleteBudgetItem(null)}
+        onConfirm={() => { if (deleteBudgetItem) deleteBudget(deleteBudgetItem.id); }}
+        title="Delete Budget"
+        message={`Remove the ${deleteBudgetItem?.category || ''} budget? This cannot be undone.`}
+        confirmLabel="Delete"
       />
     </div>
   );

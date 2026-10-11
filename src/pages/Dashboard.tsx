@@ -6,7 +6,7 @@ import { formatCurrency } from '@/lib/finance';
 import { getIcon } from '@/lib/icons';
 import { Page } from '@/App';
 import {
-  Wallet, TrendingDown, TrendingUp, CalendarClock, ShieldCheck, Gauge,
+  Wallet, TrendingDown, TrendingUp, CalendarClock,
   PieChart as PieChartIcon, LineChart as LineChartIcon, ArrowRight,
   Sparkles, Target, Zap, FlaskConical,
 } from 'lucide-react';

@@ -9,6 +9,7 @@ import { getIcon } from '@/lib/icons';
 import { Subscription } from '@/types';
 import { Plus, Trash2, Edit, Repeat, Power, CalendarClock } from 'lucide-react';
 import { LucideIcon } from 'lucide-react';
+import { ConfirmDialog } from '@/components/ui/ConfirmDialog';
 
 const subIcons = ['Music', 'Tv', 'ShoppingBag', 'Dumbbell', 'Headphones', 'Film', 'Gamepad2', 'BookOpen', 'Smartphone', 'Wifi', 'Camera', 'Laptop'];
 
@@ -18,6 +19,7 @@ export function Subscriptions() {
 
   const [modalOpen, setModalOpen] = useState(false);
   const [editSub, setEditSub] = useState<Subscription | null>(null);
+  const [deleteSubItem, setDeleteSubItem] = useState<Subscription | null>(null);
 
   const activeSubs = state.subscriptions.filter((s) => s.active);
   const inactiveSubs = state.subscriptions.filter((s) => !s.active);
@@ -90,10 +92,10 @@ export function Subscriptions() {
                     <Power size={13} /> Pause
                   </button>
                   <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                    <button onClick={() => openEdit(sub)} className="w-7 h-7 rounded-lg flex items-center justify-center text-navy-400 hover:text-lime-400 hover:bg-white/[0.05] transition-all">
+                    <button onClick={() => openEdit(sub)} className="w-7 h-7 rounded-lg flex items-center justify-center text-navy-400 hover:text-lime-400 hover:bg-white/[0.05] transition-all" aria-label="Edit subscription">
                       <Edit size={14} />
                     </button>
-                    <button onClick={() => deleteSubscription(sub.id)} className="w-7 h-7 rounded-lg flex items-center justify-center text-navy-400 hover:text-red-400 hover:bg-white/[0.05] transition-all">
+                    <button onClick={() => setDeleteSubItem(sub)} className="w-7 h-7 rounded-lg flex items-center justify-center text-navy-400 hover:text-red-400 hover:bg-white/[0.05] transition-all" aria-label="Delete subscription">
                       <Trash2 size={14} />
                     </button>
                   </div>
@@ -133,7 +135,7 @@ export function Subscriptions() {
                       <button onClick={() => updateSubscription(sub.id, { active: true })} className="btn-ghost text-xs">
                         <Power size={13} /> Resume
                       </button>
-                      <button onClick={() => deleteSubscription(sub.id)} className="w-7 h-7 rounded-lg flex items-center justify-center text-navy-400 hover:text-red-400 hover:bg-white/[0.05] transition-all">
+                      <button onClick={() => setDeleteSubItem(sub)} className="w-7 h-7 rounded-lg flex items-center justify-center text-navy-400 hover:text-red-400 hover:bg-white/[0.05] transition-all" aria-label="Delete subscription">
                         <Trash2 size={14} />
                       </button>
                     </div>
@@ -157,6 +159,15 @@ export function Subscriptions() {
           }
           setModalOpen(false);
         }}
+      />
+
+      <ConfirmDialog
+        open={!!deleteSubItem}
+        onClose={() => setDeleteSubItem(null)}
+        onConfirm={() => { if (deleteSubItem) deleteSubscription(deleteSubItem.id); }}
+        title="Delete Subscription"
+        message={`Delete "${deleteSubItem?.name || ''}"? This cannot be undone.`}
+        confirmLabel="Delete"
       />
     </div>
   );

@@ -10,6 +10,7 @@ import { getIcon } from '@/lib/icons';
 import { SavingsGoal } from '@/types';
 import { Plus, Trash2, Edit, Target, Check } from 'lucide-react';
 import { LucideIcon } from 'lucide-react';
+import { ConfirmDialog } from '@/components/ui/ConfirmDialog';
 
 const goalColors = ['#84cc16', '#38bdf8', '#a78bfa', '#fbbf24', '#2dd4bf', '#fb7185'];
 const goalIcons = ['Shield', 'Music', 'Headphones', 'Target', 'Trophy', 'Gift', 'Plane', 'Home', 'Camera', 'Laptop', 'Watch', 'Footprints'];
@@ -21,6 +22,7 @@ export function SavingsGoals() {
   const [modalOpen, setModalOpen] = useState(false);
   const [editGoal, setEditGoal] = useState<SavingsGoal | null>(null);
   const [contributeGoal, setContributeGoal] = useState<SavingsGoal | null>(null);
+  const [deleteGoalItem, setDeleteGoalItem] = useState<SavingsGoal | null>(null);
   const [contributeAmount, setContributeAmount] = useState('');
 
   const openAdd = () => {
@@ -96,10 +98,10 @@ export function SavingsGoals() {
                   </div>
                 </div>
                 <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                  <button onClick={() => openEdit(goal)} className="w-7 h-7 rounded-lg flex items-center justify-center text-navy-400 hover:text-lime-400 hover:bg-white/[0.05] transition-all">
+                  <button onClick={() => openEdit(goal)} className="w-7 h-7 rounded-lg flex items-center justify-center text-navy-400 hover:text-lime-400 hover:bg-white/[0.05] transition-all" aria-label="Edit goal">
                     <Edit size={14} />
                   </button>
-                  <button onClick={() => deleteSavingsGoal(goal.id)} className="w-7 h-7 rounded-lg flex items-center justify-center text-navy-400 hover:text-red-400 hover:bg-white/[0.05] transition-all">
+                  <button onClick={() => setDeleteGoalItem(goal)} className="w-7 h-7 rounded-lg flex items-center justify-center text-navy-400 hover:text-red-400 hover:bg-white/[0.05] transition-all" aria-label="Delete goal">
                     <Trash2 size={14} />
                   </button>
                 </div>
@@ -152,6 +154,15 @@ export function SavingsGoals() {
           }
           setModalOpen(false);
         }}
+      />
+
+      <ConfirmDialog
+        open={!!deleteGoalItem}
+        onClose={() => setDeleteGoalItem(null)}
+        onConfirm={() => { if (deleteGoalItem) deleteSavingsGoal(deleteGoalItem.id); }}
+        title="Delete Savings Goal"
+        message={`Delete "${deleteGoalItem?.name || ''}"? This cannot be undone.`}
+        confirmLabel="Delete"
       />
 
       {/* Contribute Modal */}

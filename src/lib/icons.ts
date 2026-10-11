@@ -7,7 +7,7 @@ import {
   Info, AlertCircle, Plus, Trash2, Edit, Check, X, Filter, Search, RefreshCw,
   Download, Bell, Menu, ChevronRight, Zap, Coffee, Bus, Film, Gamepad2,
   BookOpen, Stethoscope, Lightbulb, Trophy, Gift, Plane, Home, Smartphone,
-  Wifi, Zap as ZapIcon, Droplet, Camera, Laptop, Watch, Footprints,
+  Wifi, Droplet, Camera, Laptop, Watch, Footprints,
 } from 'lucide-react';
 import { LucideIcon } from 'lucide-react';
 

@@ -9,6 +9,7 @@ import { getIcon } from '@/lib/icons';
 import { CATEGORY_META, Category, CATEGORIES, Transaction } from '@/types';
 import { Plus, Search, Filter, Trash2, Edit, ArrowDownCircle, ArrowUpCircle, Wallet, ChevronDown, Repeat } from 'lucide-react';
 import { LucideIcon } from 'lucide-react';
+import { ConfirmDialog } from '@/components/ui/ConfirmDialog';
 
 export function Transactions() {
   const { state, addTransaction, updateTransaction, deleteTransaction, currentDay } = useFinance();
@@ -19,6 +20,7 @@ export function Transactions() {
   const [typeFilter, setTypeFilter] = useState<'all' | 'income' | 'expense'>('all');
   const [modalOpen, setModalOpen] = useState(false);
   const [editTxn, setEditTxn] = useState<Transaction | null>(null);
+  const [deleteTxn, setDeleteTxn] = useState<Transaction | null>(null);
 
   const filtered = useMemo(() => {
     return [...state.transactions]
@@ -41,8 +43,8 @@ export function Transactions() {
     setModalOpen(true);
   };
 
-  const handleDelete = (id: string) => {
-    deleteTransaction(id);
+  const handleDelete = (txn: Transaction) => {
+    setDeleteTxn(txn);
   };
 
   return (
@@ -132,14 +134,14 @@ export function Transactions() {
                       <button
                         onClick={() => openEdit(txn)}
                         className="w-7 h-7 rounded-lg flex items-center justify-center text-navy-400 hover:text-lime-400 hover:bg-white/[0.05] transition-all"
-                        aria-label="Edit"
+                        aria-label="Edit transaction"
                       >
                         <Edit size={14} />
                       </button>
                       <button
-                        onClick={() => handleDelete(txn.id)}
+                        onClick={() => handleDelete(txn)}
                         className="w-7 h-7 rounded-lg flex items-center justify-center text-navy-400 hover:text-red-400 hover:bg-white/[0.05] transition-all"
-                        aria-label="Delete"
+                        aria-label="Delete transaction"
                       >
                         <Trash2 size={14} />
                       </button>
@@ -172,6 +174,15 @@ export function Transactions() {
           }
           setModalOpen(false);
         }}
+      />
+
+      <ConfirmDialog
+        open={!!deleteTxn}
+        onClose={() => setDeleteTxn(null)}
+        onConfirm={() => { if (deleteTxn) deleteTransaction(deleteTxn.id); }}
+        title="Delete Transaction"
+        message={`Are you sure you want to delete "${deleteTxn?.description || ''}"? This cannot be undone.`}
+        confirmLabel="Delete"
       />
     </div>
   );
