@@ -1,12 +1,13 @@
 import { useState, useEffect } from 'react';
 import { useFinance } from '@/context/useFinance';
+import { useToast } from '@/components/ui/Toast';
 import { Card } from '@/components/ui/Card';
 import { Modal } from '@/components/ui/Modal';
 import { AnimatedNumber } from '@/components/ui/AnimatedNumber';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { formatCurrency } from '@/lib/finance';
 import { getIcon } from '@/lib/icons';
-import { Subscription } from '@/types';
+import { Subscription, CATEGORIES, Category } from '@/types';
 import { Plus, Trash2, CreditCard as Edit, Repeat, Power, CalendarClock } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import { ConfirmDialog } from '@/components/ui/ConfirmDialog';
@@ -15,6 +16,7 @@ const subIcons = ['Music', 'Tv', 'ShoppingBag', 'Dumbbell', 'Headphones', 'Film'
 
 export function Subscriptions() {
   const { state, metrics, addSubscription, updateSubscription, deleteSubscription } = useFinance();
+  const { showToast } = useToast();
   const currency = state.currency;
 
   const [modalOpen, setModalOpen] = useState(false);
@@ -92,11 +94,11 @@ export function Subscriptions() {
                     <Power size={13} /> Pause
                   </button>
                   <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                    <button onClick={() => openEdit(sub)} className="w-7 h-7 rounded-lg flex items-center justify-center text-navy-400 hover:text-lime-400 hover:bg-white/[0.05] transition-all" aria-label="Edit subscription">
-                      <Edit size={14} />
+                    <button onClick={() => openEdit(sub)} className="w-8 h-8 rounded-lg flex items-center justify-center text-navy-400 hover:text-lime-400 hover:bg-white/[0.05] transition-all icon-btn" aria-label={`Edit subscription: ${sub.name}`}>
+                      <Edit size={14} aria-hidden="true" />
                     </button>
-                    <button onClick={() => setDeleteSubItem(sub)} className="w-7 h-7 rounded-lg flex items-center justify-center text-navy-400 hover:text-red-400 hover:bg-white/[0.05] transition-all" aria-label="Delete subscription">
-                      <Trash2 size={14} />
+                    <button onClick={() => setDeleteSubItem(sub)} className="w-8 h-8 rounded-lg flex items-center justify-center text-navy-400 hover:text-red-400 hover:bg-white/[0.05] transition-all icon-btn" aria-label={`Delete subscription: ${sub.name}`}>
+                      <Trash2 size={14} aria-hidden="true" />
                     </button>
                   </div>
                 </div>
@@ -135,8 +137,8 @@ export function Subscriptions() {
                       <button onClick={() => updateSubscription(sub.id, { active: true })} className="btn-ghost text-xs">
                         <Power size={13} /> Resume
                       </button>
-                      <button onClick={() => setDeleteSubItem(sub)} className="w-7 h-7 rounded-lg flex items-center justify-center text-navy-400 hover:text-red-400 hover:bg-white/[0.05] transition-all" aria-label="Delete subscription">
-                        <Trash2 size={14} />
+                      <button onClick={() => setDeleteSubItem(sub)} className="w-8 h-8 rounded-lg flex items-center justify-center text-navy-400 hover:text-red-400 hover:bg-white/[0.05] transition-all icon-btn" aria-label={`Delete subscription: ${sub.name}`}>
+                        <Trash2 size={14} aria-hidden="true" />
                       </button>
                     </div>
                   </div>
@@ -154,8 +156,10 @@ export function Subscriptions() {
         onSubmit={(data) => {
           if (editSub) {
             updateSubscription(editSub.id, data);
+            showToast('Subscription updated');
           } else {
             addSubscription(data);
+            showToast('Subscription added');
           }
           setModalOpen(false);
         }}
@@ -164,7 +168,7 @@ export function Subscriptions() {
       <ConfirmDialog
         open={!!deleteSubItem}
         onClose={() => setDeleteSubItem(null)}
-        onConfirm={() => { if (deleteSubItem) deleteSubscription(deleteSubItem.id); }}
+        onConfirm={() => { if (deleteSubItem) { deleteSubscription(deleteSubItem.id); showToast('Subscription deleted', 'info'); } }}
         title="Delete Subscription"
         message={`Delete "${deleteSubItem?.name || ''}"? This cannot be undone.`}
         confirmLabel="Delete"
@@ -215,22 +219,26 @@ function SubFormModal({ open, onClose, editSub, onSubmit }: SubFormModalProps) {
     <Modal open={open} onClose={onClose} title={editSub ? 'Edit Subscription' : 'Add Subscription'}>
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
-          <label className="label">Name</label>
-          <input className="input" placeholder="e.g. Spotify Premium" value={name} onChange={(e) => setName(e.target.value)} required />
+          <label htmlFor="sub-name" className="label">Name</label>
+          <input id="sub-name" className="input" placeholder="e.g. Spotify Premium" value={name} onChange={(e) => setName(e.target.value)} required />
         </div>
         <div className="grid grid-cols-2 gap-4">
           <div>
-            <label className="label">Amount / month</label>
-            <input className="input font-mono" type="number" min="0" step="1" placeholder="0" value={amount} onChange={(e) => setAmount(e.target.value)} required />
+            <label htmlFor="sub-amount" className="label">Amount / month</label>
+            <input id="sub-amount" className="input font-mono" type="number" min="0" step="1" placeholder="0" value={amount} onChange={(e) => setAmount(e.target.value)} required />
           </div>
           <div>
-            <label className="label">Billing Day (1-30)</label>
-            <input className="input font-mono" type="number" min="1" max="30" value={billingDay} onChange={(e) => setBillingDay(e.target.value)} required />
+            <label htmlFor="sub-billing-day" className="label">Billing Day (1-30)</label>
+            <input id="sub-billing-day" className="input font-mono" type="number" min="1" max="30" value={billingDay} onChange={(e) => setBillingDay(e.target.value)} required />
           </div>
         </div>
         <div>
-          <label className="label">Category</label>
-          <input className="input" placeholder="e.g. Entertainment" value={category} onChange={(e) => setCategory(e.target.value)} required />
+          <label htmlFor="sub-category" className="label">Category</label>
+          <select id="sub-category" className="input cursor-pointer" value={category} onChange={(e) => setCategory(e.target.value as Category)}>
+            {CATEGORIES.map((c) => (
+              <option key={c} value={c}>{c}</option>
+            ))}
+          </select>
         </div>
         <div>
           <label className="label">Icon</label>
