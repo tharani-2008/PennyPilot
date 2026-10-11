@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useFinance } from '@/context/useFinance';
+import { useToast } from '@/components/ui/Toast';
 import { Card } from '@/components/ui/Card';
 import { Modal } from '@/components/ui/Modal';
 import { ProgressBar } from '@/components/ui/RiskBadge';
@@ -12,6 +13,7 @@ import { ConfirmDialog } from '@/components/ui/ConfirmDialog';
 
 export function Budgets() {
   const { state, metrics, addBudget, updateBudget, deleteBudget } = useFinance();
+  const { showToast } = useToast();
   const currency = state.currency;
 
   const [modalOpen, setModalOpen] = useState(false);
@@ -68,7 +70,7 @@ export function Budgets() {
                 <div className="flex items-center justify-between mb-3">
                   <div className="flex items-center gap-3">
                     <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ background: `${catMeta.color}12`, color: catMeta.color }}>
-                      {bs.status === 'over' ? <AlertCircle size={18} /> : <PiggyBank size={18} />}
+                      {bs.status === 'over' ? <AlertCircle size={18} aria-hidden="true" /> : <PiggyBank size={18} aria-hidden="true" />}
                     </div>
                     <div>
                       <p className="text-sm font-semibold text-navy-50">{bs.category}</p>
@@ -78,11 +80,11 @@ export function Budgets() {
                     </div>
                   </div>
                   <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                    <button onClick={() => openEdit(state.budgets.find((b) => b.category === bs.category)!)} className="w-7 h-7 rounded-lg flex items-center justify-center text-navy-400 hover:text-lime-400 hover:bg-white/[0.05] transition-all" aria-label="Edit budget">
-                      <Edit size={14} />
+                    <button onClick={() => openEdit(state.budgets.find((b) => b.category === bs.category)!)} className="w-8 h-8 rounded-lg flex items-center justify-center text-navy-400 hover:text-lime-400 hover:bg-white/[0.05] transition-all icon-btn" aria-label={`Edit ${bs.category} budget`}>
+                      <Edit size={14} aria-hidden="true" />
                     </button>
-                    <button onClick={() => setDeleteBudgetItem(state.budgets.find((b) => b.category === bs.category) || null)} className="w-7 h-7 rounded-lg flex items-center justify-center text-navy-400 hover:text-red-400 hover:bg-white/[0.05] transition-all" aria-label="Delete budget">
-                      <Trash2 size={14} />
+                    <button onClick={() => setDeleteBudgetItem(state.budgets.find((b) => b.category === bs.category) || null)} className="w-8 h-8 rounded-lg flex items-center justify-center text-navy-400 hover:text-red-400 hover:bg-white/[0.05] transition-all icon-btn" aria-label={`Delete ${bs.category} budget`}>
+                      <Trash2 size={14} aria-hidden="true" />
                     </button>
                   </div>
                 </div>
@@ -118,8 +120,10 @@ export function Budgets() {
         onSubmit={(data) => {
           if (editBudget) {
             updateBudget(editBudget.id, data);
+            showToast('Budget updated');
           } else {
             addBudget(data);
+            showToast('Budget added');
           }
           setModalOpen(false);
         }}
@@ -128,7 +132,7 @@ export function Budgets() {
       <ConfirmDialog
         open={!!deleteBudgetItem}
         onClose={() => setDeleteBudgetItem(null)}
-        onConfirm={() => { if (deleteBudgetItem) deleteBudget(deleteBudgetItem.id); }}
+        onConfirm={() => { if (deleteBudgetItem) { deleteBudget(deleteBudgetItem.id); showToast('Budget deleted', 'info'); } }}
         title="Delete Budget"
         message={`Remove the ${deleteBudgetItem?.category || ''} budget? This cannot be undone.`}
         confirmLabel="Delete"
@@ -167,8 +171,9 @@ function BudgetFormModal({ open, onClose, editBudget, availableCategories, onSub
     <Modal open={open} onClose={onClose} title={editBudget ? 'Edit Budget' : 'Add Budget'} size="sm">
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
-          <label className="label">Category</label>
+          <label htmlFor="budget-category" className="label">Category</label>
           <select
+            id="budget-category"
             className="input cursor-pointer"
             value={category}
             onChange={(e) => setCategory(e.target.value as Category)}
@@ -184,8 +189,8 @@ function BudgetFormModal({ open, onClose, editBudget, availableCategories, onSub
           </select>
         </div>
         <div>
-          <label className="label">Monthly Limit</label>
-          <input className="input font-mono" type="number" min="0" step="1" placeholder="0" value={limit} onChange={(e) => setLimit(e.target.value)} required />
+          <label htmlFor="budget-limit" className="label">Monthly Limit</label>
+          <input id="budget-limit" className="input font-mono" type="number" min="0" step="1" placeholder="0" value={limit} onChange={(e) => setLimit(e.target.value)} required />
         </div>
         <div className="flex gap-3 pt-2">
           <button type="button" onClick={onClose} className="btn-secondary flex-1">Cancel</button>

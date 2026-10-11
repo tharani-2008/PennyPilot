@@ -105,6 +105,7 @@ export interface FinanceState {
   scenarios: SimScenario[];
   currency: string;
   userName: string;
+  isDemoData?: boolean;
 }
 
 export type RiskLevel = 'Low' | 'Moderate' | 'High' | 'Critical';

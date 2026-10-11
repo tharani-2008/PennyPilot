@@ -1,5 +1,6 @@
 import { useState, useMemo, useEffect } from 'react';
 import { useFinance } from '@/context/useFinance';
+import { useToast } from '@/components/ui/Toast';
 import { Card } from '@/components/ui/Card';
 import { Modal } from '@/components/ui/Modal';
 import { EmptyState } from '@/components/ui/EmptyState';
@@ -13,6 +14,7 @@ import { ConfirmDialog } from '@/components/ui/ConfirmDialog';
 
 export function Transactions() {
   const { state, addTransaction, updateTransaction, deleteTransaction, currentDay } = useFinance();
+  const { showToast } = useToast();
   const currency = state.currency;
 
   const [search, setSearch] = useState('');
@@ -169,8 +171,10 @@ export function Transactions() {
         onSubmit={(data) => {
           if (editTxn) {
             updateTransaction(editTxn.id, data);
+            showToast('Transaction updated');
           } else {
             addTransaction(data);
+            showToast('Transaction added');
           }
           setModalOpen(false);
         }}
@@ -179,7 +183,7 @@ export function Transactions() {
       <ConfirmDialog
         open={!!deleteTxn}
         onClose={() => setDeleteTxn(null)}
-        onConfirm={() => { if (deleteTxn) deleteTransaction(deleteTxn.id); }}
+        onConfirm={() => { if (deleteTxn) { deleteTransaction(deleteTxn.id); showToast('Transaction deleted', 'info'); } }}
         title="Delete Transaction"
         message={`Are you sure you want to delete "${deleteTxn?.description || ''}"? This cannot be undone.`}
         confirmLabel="Delete"
@@ -217,13 +221,16 @@ function TransactionFormModal({ open, onClose, editTxn, currentDay, onSubmit }: 
     e.preventDefault();
     const amt = parseFloat(amount);
     if (!amt || amt <= 0 || !description.trim()) return;
+    const dayNum = parseInt(day) || currentDay;
+    const startDate = new Date();
+    startDate.setDate(startDate.getDate() - (30 - dayNum));
     onSubmit({
       type,
       amount: amt,
       category,
       description: description.trim(),
-      day: parseInt(day) || currentDay,
-      date: new Date().toISOString().split('T')[0],
+      day: dayNum,
+      date: startDate.toISOString().split('T')[0],
       isRecurring: editTxn?.isRecurring,
     });
   };

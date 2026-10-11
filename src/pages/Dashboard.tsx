@@ -6,7 +6,7 @@ import { formatCurrency } from '@/lib/finance';
 import { tooltipStyle, axisTickStyle, gridStroke } from '@/lib/chartTheme';
 import { getIcon } from '@/lib/icons';
 import { Page } from '@/App';
-import { Wallet, TrendingDown, TrendingUp, CalendarClock, ChartPie as PieChartIcon, ChartLine as LineChartIcon, ArrowRight, Sparkles, Target, Zap, FlaskConical } from 'lucide-react';
+import { Wallet, TrendingDown, TrendingUp, CalendarClock, ChartPie as PieChartIcon, ChartLine as LineChartIcon, ArrowRight, Sparkles, Target, Zap, FlaskConical, Info } from 'lucide-react';
 import {
   PieChart, Pie, Cell, ResponsiveContainer, Tooltip,
   AreaChart, Area, XAxis, YAxis, CartesianGrid, ReferenceLine,
@@ -51,6 +51,11 @@ export function Dashboard({ onNavigate }: DashboardProps) {
                   <CalendarClock size={11} aria-hidden="true" /> Day {currentDay} of 30
                 </span>
                 <RiskBadge level={metrics.riskLevel} />
+                {state.isDemoData && (
+                  <span className="badge bg-sky-400/[0.06] text-sky-400 border border-sky-400/15" title="This dashboard shows sample data. Add or edit transactions to make it yours.">
+                    <Info size={11} aria-hidden="true" /> Sample Data
+                  </span>
+                )}
               </div>
               <p className="section-label mb-2">Available Balance</p>
               <AnimatedNumber

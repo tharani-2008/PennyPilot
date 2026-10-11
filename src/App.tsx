@@ -1,5 +1,6 @@
 import { useState, lazy, Suspense } from 'react';
 import { FinanceProvider } from '@/context/FinanceContext';
+import { ToastProvider } from '@/components/ui/Toast';
 import { Sidebar } from '@/components/layout/Sidebar';
 import { TopBar } from '@/components/layout/TopBar';
 import { Dashboard } from '@/pages/Dashboard';
@@ -33,6 +34,7 @@ function App() {
 
   return (
     <FinanceProvider>
+      <ToastProvider>
       <div className="min-h-screen flex">
         <Sidebar currentPage={page} onNavigate={navigate} mobileOpen={mobileNavOpen} onMobileClose={() => setMobileNavOpen(false)} />
         <div className="flex-1 flex flex-col min-w-0 lg:ml-64">
@@ -51,6 +53,7 @@ function App() {
           </main>
         </div>
       </div>
+      </ToastProvider>
     </FinanceProvider>
   );
 }

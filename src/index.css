@@ -199,4 +199,28 @@
     cursor: pointer;
     box-shadow: 0 0 10px rgba(163,230,53,0.3);
   }
+
+  input[type="range"]:focus-visible {
+    outline: 2px solid rgba(163, 230, 53, 0.4);
+    outline-offset: 4px;
+  }
+
+  .icon-btn {
+    @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-lime-400/30;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  .card-hover:hover {
+    transform: none;
+  }
 }

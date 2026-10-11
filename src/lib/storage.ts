@@ -139,5 +139,6 @@ export function createDefaultState(): FinanceState {
     scenarios: [],
     currency: '₹',
     userName: 'Explorer',
+    isDemoData: true,
   };
 }

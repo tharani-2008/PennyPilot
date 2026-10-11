@@ -1,19 +1,23 @@
 import { useState, useMemo } from 'react';
 import { useFinance } from '@/context/useFinance';
+import { useToast } from '@/components/ui/Toast';
 import { Card, CardHeader } from '@/components/ui/Card';
 import { ProgressBar } from '@/components/ui/RiskBadge';
 import { AnimatedNumber } from '@/components/ui/AnimatedNumber';
 import { PageHeader } from '@/components/ui/PageHeader';
+import { Modal } from '@/components/ui/Modal';
 import { simulateScenario, formatCurrency, calculateMetrics } from '@/lib/finance';
-import { FlaskConical, TrendingDown, TrendingUp, PiggyBank, Gauge, Zap, RefreshCw, Info } from 'lucide-react';
+import { FlaskConical, TrendingDown, TrendingUp, PiggyBank, Gauge, Zap, RefreshCw, Info, CircleCheck as CheckCircle } from 'lucide-react';
 
 export function WhatIfSimulator() {
-  const { state, currentDay } = useFinance();
+  const { state, currentDay, addTransaction, contributeToGoal } = useFinance();
+  const { showToast } = useToast();
   const currency = state.currency;
 
   const [spendReduction, setSpendReduction] = useState(10);
   const [additionalIncome, setAdditionalIncome] = useState(0);
   const [extraSavings, setExtraSavings] = useState(0);
+  const [applyModalOpen, setApplyModalOpen] = useState(false);
 
   const currentMetrics = useMemo(() => calculateMetrics(state, currentDay), [state, currentDay]);
   const simulated = useMemo(() => {
@@ -43,12 +47,48 @@ export function WhatIfSimulator() {
     setExtraSavings(0);
   };
 
+  const canApply = additionalIncome > 0 || extraSavings > 0;
+  const firstGoal = state.savingsGoals[0];
+
+  const handleApply = () => {
+    if (additionalIncome > 0) {
+      addTransaction({
+        type: 'income',
+        amount: additionalIncome,
+        category: 'Other',
+        description: `Simulator: extra income (${spendReduction > 0 ? `${spendReduction}% spend cut, ` : ''}+${formatCurrency(additionalIncome, currency)})`,
+        day: currentDay,
+        date: new Date().toISOString().split('T')[0],
+      });
+    }
+
+    if (extraSavings > 0 && firstGoal) {
+      contributeToGoal(firstGoal.id, extraSavings);
+    }
+
+    showToast('Scenario applied to your data');
+    setApplyModalOpen(false);
+    reset();
+  };
+
   return (
     <div className="space-y-5 max-w-5xl mx-auto">
       <PageHeader
         title="What-if Simulator"
         subtitle="See how changes affect your month-end outlook"
-        action={<button onClick={reset} className="btn-secondary" aria-label="Reset simulator to defaults"><RefreshCw size={16} aria-hidden="true" /> Reset</button>}
+        action={
+          <div className="flex gap-2">
+            <button onClick={reset} className="btn-secondary" aria-label="Reset simulator to defaults"><RefreshCw size={16} aria-hidden="true" /> Reset</button>
+            <button
+              onClick={() => setApplyModalOpen(true)}
+              disabled={!canApply}
+              className="btn-primary disabled:opacity-40 disabled:cursor-not-allowed"
+              aria-label="Apply scenario to your actual data"
+            >
+              <CheckCircle size={16} aria-hidden="true" /> Apply Scenario
+            </button>
+          </div>
+        }
       />
 
       {/* Forecast Explanation */}
@@ -60,7 +100,7 @@ export function WhatIfSimulator() {
           <div className="min-w-0">
             <h3 className="text-sm font-semibold text-navy-50 mb-1">How this forecast works</h3>
             <p className="text-xs text-navy-400 leading-relaxed">
-              This simulator takes your current balance, income, and expenses as a starting point, then applies the adjustments you choose below. It projects your end-of-month balance by factoring in future subscription billing days and unpaid commitments that fall between today and day 30. The health score recalculates using the same formula as the dashboard — spending rate, projected balance, savings progress, and unpaid obligations. <span className="text-navy-300">These are previews only — nothing you do here changes your actual saved data.</span>
+              This simulator takes your current balance, income, and expenses as a starting point, then applies the adjustments you choose below. It projects your end-of-month balance by factoring in future subscription billing days and unpaid commitments that fall between today and day 30. The health score recalculates using the same formula as the dashboard — spending rate, projected balance, savings progress, and unpaid obligations. <span className="text-navy-300">Adjust the sliders to preview outcomes. When you're ready, use Apply Scenario to write the concrete parts (extra income and savings) to your real data.</span>
             </p>
           </div>
         </div>
@@ -109,7 +149,7 @@ export function WhatIfSimulator() {
                 aria-valuenow={spendReduction}
                 aria-valuetext={`${spendReduction}% reduction`}
               />
-              <p className="text-xs text-navy-400 mt-1">Cut discretionary spending by {spendReduction}%</p>
+              <p className="text-xs text-navy-400 mt-1">Cut discretionary spending by {spendReduction}% <span className="text-navy-500">(preview only — cannot modify past transactions)</span></p>
             </div>
 
             {/* Additional Income */}
@@ -163,7 +203,7 @@ export function WhatIfSimulator() {
                 aria-valuenow={extraSavings}
                 aria-valuetext={formatCurrency(extraSavings, currency)}
               />
-              <p className="text-xs text-navy-400 mt-1">Move extra money to savings goals</p>
+              <p className="text-xs text-navy-400 mt-1">Move extra money to savings goals{!firstGoal && ' (no goals exist yet — create one first)'}</p>
             </div>
           </div>
         </Card>
@@ -279,6 +319,49 @@ export function WhatIfSimulator() {
           </div>
         </div>
       </Card>
+
+      {/* Apply Scenario Confirmation */}
+      <Modal open={applyModalOpen} onClose={() => setApplyModalOpen(false)} title="Apply Scenario" size="sm">
+        <div className="space-y-4">
+          <p className="text-sm text-navy-300 leading-relaxed">
+            This will write the following changes to your real data:
+          </p>
+          <div className="space-y-2">
+            {additionalIncome > 0 && (
+              <div className="flex items-center gap-2.5 p-3 rounded-xl bg-lime-400/[0.04] border border-lime-400/15">
+                <TrendingUp size={16} className="text-lime-400 flex-shrink-0" aria-hidden="true" />
+                <span className="text-sm text-navy-100">Add <span className="font-mono font-semibold text-lime-400">{formatCurrency(additionalIncome, currency)}</span> as income</span>
+              </div>
+            )}
+            {extraSavings > 0 && (
+              <div className="flex items-center gap-2.5 p-3 rounded-xl bg-accent-blue/[0.04] border border-accent-blue/15">
+                <PiggyBank size={16} className="text-accent-blue flex-shrink-0" aria-hidden="true" />
+                <span className="text-sm text-navy-100">
+                  Contribute <span className="font-mono font-semibold text-accent-blue">{formatCurrency(extraSavings, currency)}</span>
+                  {firstGoal ? ` to "${firstGoal.name}"` : ' (no savings goal available)'}
+                </span>
+              </div>
+            )}
+            {spendReduction > 0 && (
+              <div className="flex items-center gap-2.5 p-3 rounded-xl bg-white/[0.02] border border-white/[0.06]">
+                <Info size={16} className="text-navy-400 flex-shrink-0" aria-hidden="true" />
+                <span className="text-sm text-navy-400">Spending reduction ({spendReduction}%) is preview-only and will not modify your existing transactions</span>
+              </div>
+            )}
+          </div>
+          <p className="text-xs text-navy-400">Your existing transactions, budgets, and subscriptions remain untouched.</p>
+          <div className="flex gap-3">
+            <button onClick={() => setApplyModalOpen(false)} className="btn-secondary flex-1">Cancel</button>
+            <button
+              onClick={handleApply}
+              disabled={extraSavings > 0 && !firstGoal}
+              className="btn-primary flex-1 disabled:opacity-40 disabled:cursor-not-allowed"
+            >
+              Apply Now
+            </button>
+          </div>
+        </div>
+      </Modal>
     </div>
   );
 }

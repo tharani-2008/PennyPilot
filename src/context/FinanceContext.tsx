@@ -35,6 +35,7 @@ export function FinanceProvider({ children }: { children: ReactNode }) {
   const addTransaction = useCallback((txn: Omit<Transaction, 'id'>) => {
     setState((prev) => ({
       ...prev,
+      isDemoData: false,
       transactions: [...prev.transactions, { ...txn, id: generateId() }],
     }));
   }, []);
@@ -42,6 +43,7 @@ export function FinanceProvider({ children }: { children: ReactNode }) {
   const updateTransaction = useCallback((id: string, updates: Partial<Transaction>) => {
     setState((prev) => ({
       ...prev,
+      isDemoData: false,
       transactions: prev.transactions.map((t) => (t.id === id ? { ...t, ...updates } : t)),
     }));
   }, []);
@@ -49,6 +51,7 @@ export function FinanceProvider({ children }: { children: ReactNode }) {
   const deleteTransaction = useCallback((id: string) => {
     setState((prev) => ({
       ...prev,
+      isDemoData: false,
       transactions: prev.transactions.filter((t) => t.id !== id),
     }));
   }, []);
@@ -56,6 +59,7 @@ export function FinanceProvider({ children }: { children: ReactNode }) {
   const addSavingsGoal = useCallback((goal: Omit<SavingsGoal, 'id'>) => {
     setState((prev) => ({
       ...prev,
+      isDemoData: false,
       savingsGoals: [...prev.savingsGoals, { ...goal, id: generateId() }],
     }));
   }, []);
@@ -63,6 +67,7 @@ export function FinanceProvider({ children }: { children: ReactNode }) {
   const updateSavingsGoal = useCallback((id: string, updates: Partial<SavingsGoal>) => {
     setState((prev) => ({
       ...prev,
+      isDemoData: false,
       savingsGoals: prev.savingsGoals.map((g) => (g.id === id ? { ...g, ...updates } : g)),
     }));
   }, []);
@@ -70,6 +75,7 @@ export function FinanceProvider({ children }: { children: ReactNode }) {
   const deleteSavingsGoal = useCallback((id: string) => {
     setState((prev) => ({
       ...prev,
+      isDemoData: false,
       savingsGoals: prev.savingsGoals.filter((g) => g.id !== id),
     }));
   }, []);
@@ -82,6 +88,7 @@ export function FinanceProvider({ children }: { children: ReactNode }) {
       if (actualAmount <= 0) return prev;
       return {
         ...prev,
+        isDemoData: false,
         savingsGoals: prev.savingsGoals.map((g) =>
           g.id === id ? { ...g, currentAmount: g.currentAmount + actualAmount } : g
         ),
@@ -104,6 +111,7 @@ export function FinanceProvider({ children }: { children: ReactNode }) {
   const addSubscription = useCallback((sub: Omit<Subscription, 'id'>) => {
     setState((prev) => ({
       ...prev,
+      isDemoData: false,
       subscriptions: [...prev.subscriptions, { ...sub, id: generateId() }],
     }));
   }, []);
@@ -111,6 +119,7 @@ export function FinanceProvider({ children }: { children: ReactNode }) {
   const updateSubscription = useCallback((id: string, updates: Partial<Subscription>) => {
     setState((prev) => ({
       ...prev,
+      isDemoData: false,
       subscriptions: prev.subscriptions.map((s) => (s.id === id ? { ...s, ...updates } : s)),
     }));
   }, []);
@@ -118,6 +127,7 @@ export function FinanceProvider({ children }: { children: ReactNode }) {
   const deleteSubscription = useCallback((id: string) => {
     setState((prev) => ({
       ...prev,
+      isDemoData: false,
       subscriptions: prev.subscriptions.filter((s) => s.id !== id),
     }));
   }, []);
@@ -125,6 +135,7 @@ export function FinanceProvider({ children }: { children: ReactNode }) {
   const addBudget = useCallback((budget: Omit<Budget, 'id'>) => {
     setState((prev) => ({
       ...prev,
+      isDemoData: false,
       budgets: [...prev.budgets, { ...budget, id: generateId() }],
     }));
   }, []);
@@ -132,6 +143,7 @@ export function FinanceProvider({ children }: { children: ReactNode }) {
   const updateBudget = useCallback((id: string, updates: Partial<Budget>) => {
     setState((prev) => ({
       ...prev,
+      isDemoData: false,
       budgets: prev.budgets.map((b) => (b.id === id ? { ...b, ...updates } : b)),
     }));
   }, []);
@@ -139,6 +151,7 @@ export function FinanceProvider({ children }: { children: ReactNode }) {
   const deleteBudget = useCallback((id: string) => {
     setState((prev) => ({
       ...prev,
+      isDemoData: false,
       budgets: prev.budgets.filter((b) => b.id !== id),
     }));
   }, []);
@@ -146,6 +159,7 @@ export function FinanceProvider({ children }: { children: ReactNode }) {
   const toggleCommitmentPaid = useCallback((id: string) => {
     setState((prev) => ({
       ...prev,
+      isDemoData: false,
       commitments: prev.commitments.map((c) => (c.id === id ? { ...c, paid: !c.paid } : c)),
     }));
   }, []);
@@ -153,6 +167,7 @@ export function FinanceProvider({ children }: { children: ReactNode }) {
   const addCommitment = useCallback((commitment: Omit<Commitment, 'id'>) => {
     setState((prev) => ({
       ...prev,
+      isDemoData: false,
       commitments: [...prev.commitments, { ...commitment, id: generateId() }],
     }));
   }, []);
@@ -160,12 +175,13 @@ export function FinanceProvider({ children }: { children: ReactNode }) {
   const deleteCommitment = useCallback((id: string) => {
     setState((prev) => ({
       ...prev,
+      isDemoData: false,
       commitments: prev.commitments.filter((c) => c.id !== id),
     }));
   }, []);
 
   const updateSettings = useCallback((updates: Partial<Pick<FinanceState, 'userName' | 'currency'>>) => {
-    setState((prev) => ({ ...prev, ...updates }));
+    setState((prev) => ({ ...prev, ...updates, isDemoData: false }));
   }, []);
 
   return (
