@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useFinance } from '@/context/FinanceContext';
 import { Card, CardHeader } from '@/components/ui/Card';
 import { Modal } from '@/components/ui/Modal';
-import { PageHeader } from '@/pages/Analytics';
+import { PageHeader } from '@/components/ui/PageHeader';
 import { formatCurrency } from '@/lib/finance';
 import { CalendarClock, Check, Trash2, Plus, Settings as SettingsIcon } from 'lucide-react';
 import { Commitment, Category, CATEGORIES } from '@/types';

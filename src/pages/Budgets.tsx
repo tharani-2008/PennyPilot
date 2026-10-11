@@ -4,7 +4,7 @@ import { Card } from '@/components/ui/Card';
 import { Modal } from '@/components/ui/Modal';
 import { ProgressBar } from '@/components/ui/RiskBadge';
 import { EmptyState } from '@/components/ui/EmptyState';
-import { PageHeader } from '@/pages/Analytics';
+import { PageHeader } from '@/components/ui/PageHeader';
 import { formatCurrency } from '@/lib/finance';
 import { CATEGORY_META, Category, CATEGORIES, Budget } from '@/types';
 import { Plus, Trash2, Edit, PiggyBank, AlertCircle } from 'lucide-react';

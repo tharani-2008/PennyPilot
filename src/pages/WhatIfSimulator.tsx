@@ -3,7 +3,7 @@ import { useFinance } from '@/context/FinanceContext';
 import { Card, CardHeader } from '@/components/ui/Card';
 import { ProgressBar } from '@/components/ui/RiskBadge';
 import { AnimatedNumber } from '@/components/ui/AnimatedNumber';
-import { PageHeader } from '@/pages/Analytics';
+import { PageHeader } from '@/components/ui/PageHeader';
 import { simulateScenario, formatCurrency, calculateMetrics } from '@/lib/finance';
 import { FlaskConical, TrendingDown, TrendingUp, PiggyBank, Gauge, Zap, RefreshCw } from 'lucide-react';
 

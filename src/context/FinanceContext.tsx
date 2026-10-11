@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useState, useCallback, ReactNode } from 'react';
+import { createContext, useContext, useEffect, useState, useCallback, useMemo, ReactNode } from 'react';
 import { FinanceState, Transaction, SavingsGoal, Subscription, Budget, Commitment } from '@/types';
 import { loadState, saveState, createDefaultState, generateId, getDayNumber } from '@/lib/storage';
 import { calculateMetrics, FinanceMetrics } from '@/lib/finance';
@@ -47,7 +47,7 @@ export function FinanceProvider({ children }: { children: ReactNode }) {
     return () => clearInterval(interval);
   }, [state.startDate]);
 
-  const metrics = calculateMetrics(state, currentDay);
+  const metrics = useMemo(() => calculateMetrics(state, currentDay), [state, currentDay]);
 
   const resetData = useCallback(() => {
     const fresh = createDefaultState();

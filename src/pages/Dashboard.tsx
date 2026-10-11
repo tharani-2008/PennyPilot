@@ -3,6 +3,7 @@ import { Card, CardHeader } from '@/components/ui/Card';
 import { AnimatedNumber } from '@/components/ui/AnimatedNumber';
 import { ProgressBar, RiskBadge } from '@/components/ui/RiskBadge';
 import { formatCurrency } from '@/lib/finance';
+import { tooltipStyle, axisTickStyle, gridStroke } from '@/lib/chartTheme';
 import { getIcon } from '@/lib/icons';
 import { Page } from '@/App';
 import {
@@ -28,16 +29,6 @@ const insightStyleMap: Record<string, { bg: string; border: string; text: string
   info: { bg: 'bg-sky-400/[0.04]', border: 'border-sky-400/10', text: 'text-sky-400', iconBg: 'bg-sky-400/10' },
 };
 
-const tooltipStyle = {
-  background: 'rgba(6, 11, 22, 0.92)',
-  border: '1px solid rgba(43, 65, 104, 0.4)',
-  borderRadius: '10px',
-  fontSize: '12px',
-  color: '#f0f4f8',
-  boxShadow: '0 8px 24px -8px rgba(0,0,0,0.4)',
-  padding: '8px 12px',
-};
-
 export function Dashboard({ onNavigate }: DashboardProps) {
   const { metrics, state, currentDay } = useFinance();
   const currency = state.currency;
@@ -53,7 +44,7 @@ export function Dashboard({ onNavigate }: DashboardProps) {
   return (
     <div className="space-y-5 max-w-7xl mx-auto">
       {/* Hero — Balance focal point */}
-      <div className="animate-slide-up">
+      <section className="animate-slide-up" aria-label="Balance overview">
         <div className="card relative overflow-hidden p-5 sm:p-6">
           <div className="absolute inset-0 bg-gradient-hero pointer-events-none" />
           <div className="absolute -top-12 -right-6 w-48 h-48 bg-lime-400/[0.03] rounded-full blur-3xl pointer-events-none" />
@@ -118,18 +109,18 @@ export function Dashboard({ onNavigate }: DashboardProps) {
               </button>
             }
           />
-          <div className="px-5 pb-5">
+          <div className="px-4 sm:px-5 pb-5">
             <ResponsiveContainer width="100%" height={220}>
-              <AreaChart data={forecastData} margin={{ top: 18, right: 8, left: -8, bottom: 0 }}>
+              <AreaChart data={forecastData} margin={{ top: 18, right: 8, left: -16, bottom: 0 }}>
                 <defs>
                   <linearGradient id="balanceGradient" x1="0" y1="0" x2="0" y2="1">
                     <stop offset="0%" stopColor="#84cc16" stopOpacity={0.25} />
                     <stop offset="100%" stopColor="#84cc16" stopOpacity={0} />
                   </linearGradient>
                 </defs>
-                <CartesianGrid strokeDasharray="3 3" stroke="#1d304f" vertical={false} strokeOpacity={0.4} />
-                <XAxis dataKey="day" tick={{ fill: '#5a739e', fontSize: 10 }} axisLine={false} tickLine={false} tickMargin={8} />
-                <YAxis tick={{ fill: '#5a739e', fontSize: 10 }} axisLine={false} tickLine={false} tickFormatter={(v) => `${currency}${(v / 1000).toFixed(0)}K`} tickMargin={4} />
+                <CartesianGrid strokeDasharray="3 3" stroke={gridStroke} vertical={false} strokeOpacity={0.4} />
+                <XAxis dataKey="day" tick={axisTickStyle} axisLine={false} tickLine={false} tickMargin={8} />
+                <YAxis tick={axisTickStyle} axisLine={false} tickLine={false} tickFormatter={(v) => `${currency}${(v / 1000).toFixed(0)}K`} tickMargin={4} />
                 <ReferenceLine y={0} stroke="#ef4444" strokeDasharray="4 4" strokeOpacity={0.2} />
                 <ReferenceLine x={currentDay} stroke="#84cc16" strokeDasharray="3 3" strokeOpacity={0.3} label={{ value: 'Today', fill: '#84cc16', fontSize: 9, position: 'top' }} />
                 <Tooltip
@@ -153,7 +144,7 @@ export function Dashboard({ onNavigate }: DashboardProps) {
               </button>
             }
           />
-          <div className="px-5 pb-5">
+          <div className="px-4 sm:px-5 pb-5">
             {metrics.categoryBreakdown.length > 0 ? (
               <div className="flex flex-col items-center">
                 <ResponsiveContainer width="100%" height={160}>
@@ -208,7 +199,7 @@ export function Dashboard({ onNavigate }: DashboardProps) {
               </button>
             }
           />
-          <div className="px-5 pb-5 space-y-3">
+          <div className="px-4 sm:px-5 pb-5 space-y-3">
             {state.savingsGoals.map((goal) => (
               <div key={goal.id}>
                 <div className="flex items-center justify-between mb-1.5">
@@ -255,7 +246,7 @@ export function Dashboard({ onNavigate }: DashboardProps) {
             }
           />
           <div className="px-3 pb-3 space-y-0.5 max-h-[300px] overflow-y-auto scrollbar-thin">
-            {metrics.recentTransactions.map((txn) => {
+            {metrics.recentTransactions.length > 0 ? (
               const catMeta = CATEGORY_META[txn.category as Category] || CATEGORY_META.Other;
               const Icon = getIcon(catMeta.icon) as LucideIcon;
               return (

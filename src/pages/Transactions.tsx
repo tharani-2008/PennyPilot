@@ -3,7 +3,7 @@ import { useFinance } from '@/context/FinanceContext';
 import { Card } from '@/components/ui/Card';
 import { Modal } from '@/components/ui/Modal';
 import { EmptyState } from '@/components/ui/EmptyState';
-import { PageHeader } from '@/pages/Analytics';
+import { PageHeader } from '@/components/ui/PageHeader';
 import { formatCurrency } from '@/lib/finance';
 import { getIcon } from '@/lib/icons';
 import { CATEGORY_META, Category, CATEGORIES, Transaction } from '@/types';
