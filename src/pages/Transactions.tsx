@@ -135,17 +135,17 @@ export function Transactions() {
                     <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                       <button
                         onClick={() => openEdit(txn)}
-                        className="w-7 h-7 rounded-lg flex items-center justify-center text-navy-400 hover:text-lime-400 hover:bg-white/[0.05] transition-all"
-                        aria-label="Edit transaction"
+                        className="w-8 h-8 rounded-lg flex items-center justify-center text-navy-400 hover:text-lime-400 hover:bg-white/[0.05] transition-all icon-btn"
+                        aria-label={`Edit transaction: ${txn.description}`}
                       >
-                        <Edit size={14} />
+                        <Edit size={14} aria-hidden="true" />
                       </button>
                       <button
                         onClick={() => handleDelete(txn)}
-                        className="w-7 h-7 rounded-lg flex items-center justify-center text-navy-400 hover:text-red-400 hover:bg-white/[0.05] transition-all"
-                        aria-label="Delete transaction"
+                        className="w-8 h-8 rounded-lg flex items-center justify-center text-navy-400 hover:text-red-400 hover:bg-white/[0.05] transition-all icon-btn"
+                        aria-label={`Delete transaction: ${txn.description}`}
                       >
-                        <Trash2 size={14} />
+                        <Trash2 size={14} aria-hidden="true" />
                       </button>
                     </div>
                   </div>
