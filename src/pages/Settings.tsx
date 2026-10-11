@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useFinance } from '@/context/useFinance';
+import { useToast } from '@/components/ui/Toast';
 import { Card, CardHeader } from '@/components/ui/Card';
 import { Modal } from '@/components/ui/Modal';
 import { PageHeader } from '@/components/ui/PageHeader';
@@ -10,6 +11,7 @@ import { ConfirmDialog } from '@/components/ui/ConfirmDialog';
 
 export function Settings() {
   const { state, metrics, currentDay, resetData, updateSettings, toggleCommitmentPaid, addCommitment, deleteCommitment } = useFinance();
+  const { showToast } = useToast();
   const currency = state.currency;
 
   const [userName, setUserName] = useState(state.userName);
@@ -20,6 +22,7 @@ export function Settings() {
 
   const handleSaveSettings = () => {
     updateSettings({ userName: userName.trim() || 'Explorer', currency: currencySymbol });
+    showToast('Settings saved');
   };
 
   return (
@@ -105,7 +108,7 @@ export function Settings() {
                 <div key={c.id} className="flex items-center justify-between p-3 rounded-xl bg-white/[0.02] border border-white/[0.06] group">
                   <div className="flex items-center gap-3">
                     <button
-                      onClick={() => toggleCommitmentPaid(c.id)}
+                      onClick={() => { toggleCommitmentPaid(c.id); showToast(c.paid ? 'Commitment marked unpaid' : 'Commitment marked paid'); }}
                       className={`w-6 h-6 rounded-lg flex items-center justify-center transition-all ${
                         c.paid ? 'bg-lime-400/20 text-lime-400' : 'bg-white/[0.05] text-navy-500 hover:text-navy-300'
                       }`}
@@ -194,6 +197,7 @@ export function Settings() {
           <button
             onClick={() => {
               resetData();
+              showToast('All data reset', 'info');
               setResetModalOpen(false);
             }}
             className="btn-primary flex-1 bg-red-500 hover:bg-red-400 text-white"
@@ -206,7 +210,7 @@ export function Settings() {
       <ConfirmDialog
         open={!!deleteCommitmentItem}
         onClose={() => setDeleteCommitmentItem(null)}
-        onConfirm={() => { if (deleteCommitmentItem) deleteCommitment(deleteCommitmentItem.id); }}
+        onConfirm={() => { if (deleteCommitmentItem) { deleteCommitment(deleteCommitmentItem.id); showToast('Commitment deleted', 'info'); } }}
         title="Delete Commitment"
         message={`Delete "${deleteCommitmentItem?.name || ''}"? This cannot be undone.`}
         confirmLabel="Delete"
@@ -218,6 +222,7 @@ export function Settings() {
         onClose={() => setCommitmentModalOpen(false)}
         onSubmit={(data) => {
           addCommitment(data);
+          showToast('Commitment added');
           setCommitmentModalOpen(false);
         }}
       />
