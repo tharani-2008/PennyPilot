@@ -1,10 +1,10 @@
-import { useFinance } from '@/context/FinanceContext';
+import { useFinance } from '@/context/useFinance';
 import { Card, CardHeader } from '@/components/ui/Card';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { formatCurrency, formatCompact } from '@/lib/finance';
 import { tooltipStyle, axisTickStyle, legendStyle, gridStroke } from '@/lib/chartTheme';
 import { CATEGORY_META, Category } from '@/types';
-import { BarChart3, TrendingDown, TrendingUp, CalendarClock, PieChart as PieChartIcon, Activity } from 'lucide-react';
+import { ChartBar as BarChart3, TrendingDown, TrendingUp, CalendarClock, ChartPie as PieChartIcon, Activity } from 'lucide-react';
 import {
   BarChart, Bar, PieChart, Pie, Cell, ResponsiveContainer, Tooltip,
   XAxis, YAxis, CartesianGrid, RadialBarChart, RadialBar, Legend,

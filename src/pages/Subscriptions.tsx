@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useFinance } from '@/context/FinanceContext';
+import { useFinance } from '@/context/useFinance';
 import { Card } from '@/components/ui/Card';
 import { Modal } from '@/components/ui/Modal';
 import { AnimatedNumber } from '@/components/ui/AnimatedNumber';
@@ -7,8 +7,8 @@ import { PageHeader } from '@/components/ui/PageHeader';
 import { formatCurrency } from '@/lib/finance';
 import { getIcon } from '@/lib/icons';
 import { Subscription } from '@/types';
-import { Plus, Trash2, Edit, Repeat, Power, CalendarClock } from 'lucide-react';
-import { LucideIcon } from 'lucide-react';
+import { Plus, Trash2, CreditCard as Edit, Repeat, Power, CalendarClock } from 'lucide-react';
+import type { LucideIcon } from 'lucide-react';
 import { ConfirmDialog } from '@/components/ui/ConfirmDialog';
 
 const subIcons = ['Music', 'Tv', 'ShoppingBag', 'Dumbbell', 'Headphones', 'Film', 'Gamepad2', 'BookOpen', 'Smartphone', 'Wifi', 'Camera', 'Laptop'];

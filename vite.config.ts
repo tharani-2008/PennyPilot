@@ -10,6 +10,17 @@ export default defineConfig({
       '@': fileURLToPath(new URL('./src', import.meta.url)),
     },
   },
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          recharts: ['recharts'],
+          lucide: ['lucide-react'],
+          vendor: ['react', 'react-dom'],
+        },
+      },
+    },
+  },
   optimizeDeps: {
     exclude: ['lucide-react'],
   },

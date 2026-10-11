@@ -1,33 +1,10 @@
-import { createContext, useContext, useEffect, useState, useCallback, useMemo, ReactNode } from 'react';
+import { createContext, useEffect, useState, useCallback, useMemo, ReactNode } from 'react';
 import { FinanceState, Transaction, SavingsGoal, Subscription, Budget, Commitment } from '@/types';
 import { loadState, saveState, createDefaultState, generateId, getDayNumber } from '@/lib/storage';
-import { calculateMetrics, FinanceMetrics } from '@/lib/finance';
+import { calculateMetrics } from '@/lib/finance';
+import type { FinanceContextValue } from '@/context/types';
 
-interface FinanceContextValue {
-  state: FinanceState;
-  metrics: FinanceMetrics;
-  currentDay: number;
-  resetData: () => void;
-  addTransaction: (txn: Omit<Transaction, 'id'>) => void;
-  updateTransaction: (id: string, updates: Partial<Transaction>) => void;
-  deleteTransaction: (id: string) => void;
-  addSavingsGoal: (goal: Omit<SavingsGoal, 'id'>) => void;
-  updateSavingsGoal: (id: string, updates: Partial<SavingsGoal>) => void;
-  deleteSavingsGoal: (id: string) => void;
-  contributeToGoal: (id: string, amount: number) => void;
-  addSubscription: (sub: Omit<Subscription, 'id'>) => void;
-  updateSubscription: (id: string, updates: Partial<Subscription>) => void;
-  deleteSubscription: (id: string) => void;
-  addBudget: (budget: Omit<Budget, 'id'>) => void;
-  updateBudget: (id: string, updates: Partial<Budget>) => void;
-  deleteBudget: (id: string) => void;
-  toggleCommitmentPaid: (id: string) => void;
-  addCommitment: (commitment: Omit<Commitment, 'id'>) => void;
-  deleteCommitment: (id: string) => void;
-  updateSettings: (updates: Partial<Pick<FinanceState, 'userName' | 'currency'>>) => void;
-}
-
-const FinanceContext = createContext<FinanceContextValue | null>(null);
+export const FinanceContext = createContext<FinanceContextValue | null>(null);
 
 export function FinanceProvider({ children }: { children: ReactNode }) {
   const [state, setState] = useState<FinanceState>(() => {
@@ -222,8 +199,4 @@ export function FinanceProvider({ children }: { children: ReactNode }) {
   );
 }
 
-export function useFinance(): FinanceContextValue {
-  const ctx = useContext(FinanceContext);
-  if (!ctx) throw new Error('useFinance must be used within FinanceProvider');
-  return ctx;
-}
+

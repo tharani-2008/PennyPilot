@@ -2,7 +2,7 @@ import { useEffect, useRef } from 'react';
 import { Bell, X } from 'lucide-react';
 import { Insight } from '@/lib/finance';
 import { getIcon } from '@/lib/icons';
-import { LucideIcon } from 'lucide-react';
+import type { LucideIcon } from 'lucide-react';
 
 interface NotificationPanelProps {
   open: boolean;

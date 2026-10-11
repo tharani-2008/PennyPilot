@@ -1,5 +1,5 @@
 import { useState, useMemo, useEffect } from 'react';
-import { useFinance } from '@/context/FinanceContext';
+import { useFinance } from '@/context/useFinance';
 import { Card } from '@/components/ui/Card';
 import { Modal } from '@/components/ui/Modal';
 import { EmptyState } from '@/components/ui/EmptyState';
@@ -7,8 +7,8 @@ import { PageHeader } from '@/components/ui/PageHeader';
 import { formatCurrency } from '@/lib/finance';
 import { getIcon } from '@/lib/icons';
 import { CATEGORY_META, Category, CATEGORIES, Transaction } from '@/types';
-import { Plus, Search, Filter, Trash2, Edit, ArrowDownCircle, ArrowUpCircle, Wallet, ChevronDown, Repeat } from 'lucide-react';
-import { LucideIcon } from 'lucide-react';
+import { Plus, Search, Filter, Trash2, CreditCard as Edit, CircleArrowDown as ArrowDownCircle, CircleArrowUp as ArrowUpCircle, Wallet, ChevronDown, Repeat } from 'lucide-react';
+import type { LucideIcon } from 'lucide-react';
 import { ConfirmDialog } from '@/components/ui/ConfirmDialog';
 
 export function Transactions() {

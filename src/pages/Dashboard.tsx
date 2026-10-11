@@ -1,4 +1,4 @@
-import { useFinance } from '@/context/FinanceContext';
+import { useFinance } from '@/context/useFinance';
 import { Card, CardHeader } from '@/components/ui/Card';
 import { AnimatedNumber } from '@/components/ui/AnimatedNumber';
 import { ProgressBar, RiskBadge } from '@/components/ui/RiskBadge';
@@ -6,17 +6,13 @@ import { formatCurrency } from '@/lib/finance';
 import { tooltipStyle, axisTickStyle, gridStroke } from '@/lib/chartTheme';
 import { getIcon } from '@/lib/icons';
 import { Page } from '@/App';
-import {
-  Wallet, TrendingDown, TrendingUp, CalendarClock,
-  PieChart as PieChartIcon, LineChart as LineChartIcon, ArrowRight,
-  Sparkles, Target, Zap, FlaskConical,
-} from 'lucide-react';
+import { Wallet, TrendingDown, TrendingUp, CalendarClock, ChartPie as PieChartIcon, ChartLine as LineChartIcon, ArrowRight, Sparkles, Target, Zap, FlaskConical } from 'lucide-react';
 import {
   PieChart, Pie, Cell, ResponsiveContainer, Tooltip,
   AreaChart, Area, XAxis, YAxis, CartesianGrid, ReferenceLine,
 } from 'recharts';
 import { CATEGORY_META, Category } from '@/types';
-import { LucideIcon } from 'lucide-react';
+import type { LucideIcon } from 'lucide-react';
 
 interface DashboardProps {
   onNavigate: (page: Page) => void;
@@ -52,7 +48,7 @@ export function Dashboard({ onNavigate }: DashboardProps) {
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-2 mb-3">
                 <span className="badge bg-white/[0.04] text-navy-300 border border-white/[0.08]">
-                  <CalendarClock size={11} /> Day {currentDay} of 30
+                  <CalendarClock size={11} aria-hidden="true" /> Day {currentDay} of 30
                 </span>
                 <RiskBadge level={metrics.riskLevel} />
               </div>
@@ -64,12 +60,12 @@ export function Dashboard({ onNavigate }: DashboardProps) {
               />
               <div className="flex items-center gap-4 mt-4">
                 <div className="flex items-center gap-1.5">
-                  <TrendingDown size={14} className="text-accent-coral" />
+                  <TrendingDown size={14} className="text-accent-coral" aria-hidden="true" />
                   <span className="text-xs text-navy-400">Spent {formatCurrency(metrics.totalSpending, currency)}</span>
                 </div>
                 <div className="w-px h-3 bg-white/10" />
                 <div className="flex items-center gap-1.5">
-                  <TrendingUp size={14} className="text-lime-400" />
+                  <TrendingUp size={14} className="text-lime-400" aria-hidden="true" />
                   <span className="text-xs text-navy-400">Income {formatCurrency(metrics.totalIncome, currency)}</span>
                 </div>
               </div>
@@ -94,7 +90,7 @@ export function Dashboard({ onNavigate }: DashboardProps) {
             </div>
           </div>
         </div>
-      </div>
+      </section>
 
       {/* Spending Trend + Category Breakdown */}
       <div className="grid grid-cols-1 lg:grid-cols-5 gap-4">
@@ -219,14 +215,14 @@ export function Dashboard({ onNavigate }: DashboardProps) {
           <div className="absolute -top-12 -right-12 w-48 h-48 bg-lime-400/[0.04] rounded-full blur-3xl pointer-events-none" />
           <div className="p-5 relative h-full flex flex-col">
             <div className="w-10 h-10 rounded-xl bg-lime-400/10 flex items-center justify-center text-lime-400 mb-3">
-              <FlaskConical size={20} />
+              <FlaskConical size={20} aria-hidden="true" />
             </div>
             <h3 className="text-base font-semibold text-navy-50 mb-1">What-if Simulator</h3>
             <p className="text-xs text-navy-400 leading-relaxed mb-4 flex-1">
               See how cutting spending, earning more, or saving extra changes your month-end outlook.
             </p>
             <button onClick={() => onNavigate('simulator')} className="btn-primary w-full text-sm">
-              <Zap size={15} /> Try Simulator
+              <Zap size={15} aria-hidden="true" /> Try Simulator
             </button>
           </div>
         </Card>
@@ -245,42 +241,46 @@ export function Dashboard({ onNavigate }: DashboardProps) {
               </button>
             }
           />
-          <div className="px-3 pb-3 space-y-0.5 max-h-[300px] overflow-y-auto scrollbar-thin">
+          <div className="px-3 pb-3 space-y-0.5 max-h-[300px] overflow-y-auto scrollbar-thin" role="list" aria-label="Recent transactions">
             {metrics.recentTransactions.length > 0 ? (
-              const catMeta = CATEGORY_META[txn.category as Category] || CATEGORY_META.Other;
-              const Icon = getIcon(catMeta.icon) as LucideIcon;
-              return (
-                <div key={txn.id} className="flex items-center justify-between p-2.5 rounded-xl hover:bg-white/[0.03] transition-all">
-                  <div className="flex items-center gap-3 min-w-0">
-                    <div className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0" style={{ background: `${catMeta.color}12`, color: catMeta.color }}>
-                      <Icon size={14} />
+              metrics.recentTransactions.map((txn) => {
+                const catMeta = CATEGORY_META[txn.category as Category] || CATEGORY_META.Other;
+                const Icon = getIcon(catMeta.icon) as LucideIcon;
+                return (
+                  <div key={txn.id} className="flex items-center justify-between p-2.5 rounded-xl hover:bg-white/[0.03] transition-all" role="listitem">
+                    <div className="flex items-center gap-3 min-w-0">
+                      <div className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0" style={{ background: `${catMeta.color}12`, color: catMeta.color }}>
+                        <Icon size={14} />
+                      </div>
+                      <div className="min-w-0">
+                        <p className="text-sm text-navy-100 font-medium truncate">{txn.description}</p>
+                        <p className="text-[11px] text-navy-400">{txn.category} · Day {txn.day}</p>
+                      </div>
                     </div>
-                    <div className="min-w-0">
-                      <p className="text-sm text-navy-100 font-medium truncate">{txn.description}</p>
-                      <p className="text-[11px] text-navy-400">{txn.category} · Day {txn.day}</p>
-                    </div>
+                    <span className={`text-sm font-mono font-semibold flex-shrink-0 ${txn.type === 'income' ? 'text-lime-400' : 'text-navy-100'}`}>
+                      {txn.type === 'income' ? '+' : '-'}{formatCurrency(txn.amount, currency)}
+                    </span>
                   </div>
-                  <span className={`text-sm font-mono font-semibold flex-shrink-0 ${txn.type === 'income' ? 'text-lime-400' : 'text-navy-100'}`}>
-                    {txn.type === 'income' ? '+' : '-'}{formatCurrency(txn.amount, currency)}
-                  </span>
-                </div>
-              );
-            })}
+                );
+              })
+            ) : (
+              <div className="py-8 text-center text-sm text-navy-400">No transactions yet</div>
+            )}
           </div>
         </Card>
 
         <Card delay={6}>
           <CardHeader title="Smart Money Coach" subtitle="Personalized insights" icon={<Sparkles size={16} />} />
-          <div className="px-5 pb-5 space-y-2 max-h-[300px] overflow-y-auto scrollbar-thin">
+          <div className="px-5 pb-5 space-y-2 max-h-[300px] overflow-y-auto scrollbar-thin" role="list" aria-label="Financial insights">
             {metrics.insights.length > 0 ? (
               metrics.insights.map((insight) => {
                 const style = insightStyleMap[insight.type];
                 const Icon = getIcon(insight.icon);
                 return (
-                  <div key={insight.id} className={`p-3 rounded-xl ${style.bg} ${style.border} border`}>
+                  <div key={insight.id} className={`p-3 rounded-xl ${style.bg} ${style.border} border`} role="listitem">
                     <div className="flex items-start gap-2.5">
                       <div className={`w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0 ${style.iconBg} ${style.text}`}>
-                        <Icon size={13} />
+                        <Icon size={13} aria-hidden="true" />
                       </div>
                       <div className="min-w-0">
                         <p className="text-sm font-semibold text-navy-50">{insight.title}</p>
@@ -292,7 +292,7 @@ export function Dashboard({ onNavigate }: DashboardProps) {
               })
             ) : (
               <div className="flex flex-col items-center justify-center py-8 text-center">
-                <Sparkles size={22} className="text-lime-400 mb-2" />
+                <Sparkles size={22} className="text-lime-400 mb-2" aria-hidden="true" />
                 <p className="text-sm text-navy-300">Your finances look healthy!</p>
                 <p className="text-xs text-navy-400 mt-1">No warnings at this time.</p>
               </div>

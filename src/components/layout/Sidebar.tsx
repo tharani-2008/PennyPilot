@@ -1,6 +1,6 @@
-import { Wallet, LayoutDashboard, ArrowLeftRight, PiggyBank, Target, Repeat, FlaskConical, BarChart3, Settings as SettingsIcon, X } from 'lucide-react';
+import { Wallet, LayoutDashboard, ArrowLeftRight, PiggyBank, Target, Repeat, FlaskConical, ChartBar as BarChart3, Settings as SettingsIcon, X } from 'lucide-react';
 import { Page } from '@/App';
-import { useFinance } from '@/context/FinanceContext';
+import { useFinance } from '@/context/useFinance';
 import { formatCurrency } from '@/lib/finance';
 
 interface SidebarProps {
@@ -27,19 +27,20 @@ export function Sidebar({ currentPage, onNavigate, mobileOpen, onMobileClose }: 
   return (
     <>
       {mobileOpen && (
-        <div className="fixed inset-0 z-40 bg-navy-975/70 backdrop-blur-sm lg:hidden animate-fade-in" onClick={onMobileClose} />
+        <div className="fixed inset-0 z-40 bg-navy-975/70 backdrop-blur-sm lg:hidden animate-fade-in" onClick={onMobileClose} aria-hidden="true" />
       )}
       <aside
         className={`fixed top-0 left-0 z-50 h-full w-64 glass-strong border-r border-white/[0.06] flex flex-col transition-transform duration-300 lg:translate-x-0 ${
           mobileOpen ? 'translate-x-0' : '-translate-x-full'
         }`}
+        aria-label="Main navigation"
       >
         {/* Logo */}
         <div className="flex items-center justify-between px-5 pt-6 pb-5">
           <div className="flex items-center gap-2.5">
             <div className="relative">
               <div className="w-9 h-9 rounded-lg bg-gradient-lime flex items-center justify-center shadow-lg shadow-lime-400/15">
-                <Wallet className="text-navy-950" size={20} strokeWidth={2.5} />
+                <Wallet className="text-navy-950" size={20} strokeWidth={2.5} aria-hidden="true" />
               </div>
             </div>
             <div>
@@ -49,9 +50,10 @@ export function Sidebar({ currentPage, onNavigate, mobileOpen, onMobileClose }: 
           </div>
           <button
             onClick={onMobileClose}
-            className="lg:hidden w-7 h-7 rounded-lg flex items-center justify-center text-navy-400 hover:bg-white/[0.05]"
+            className="lg:hidden w-9 h-9 rounded-lg flex items-center justify-center text-navy-400 hover:bg-white/[0.05] transition-all"
+            aria-label="Close navigation menu"
           >
-            <X size={16} />
+            <X size={18} aria-hidden="true" />
           </button>
         </div>
 
@@ -61,9 +63,9 @@ export function Sidebar({ currentPage, onNavigate, mobileOpen, onMobileClose }: 
             <div className="px-3.5 pt-3 pb-3">
               <div className="flex items-center justify-between mb-2">
                 <span className="text-[10px] font-semibold text-navy-300 uppercase tracking-wider">30-Day Challenge</span>
-                <span className="text-xs font-mono text-lime-400 font-bold">{currentDay}/30</span>
+                <span className="text-xs font-mono text-lime-400 font-bold" aria-label={`Day ${currentDay} of 30`}>{currentDay}/30</span>
               </div>
-              <div className="h-1 bg-white/[0.06] rounded-full overflow-hidden">
+              <div className="h-1 bg-white/[0.06] rounded-full overflow-hidden" role="progressbar" aria-valuenow={currentDay} aria-valuemin={0} aria-valuemax={30} aria-label="30-day challenge progress">
                 <div
                   className="h-full bg-gradient-lime rounded-full transition-all duration-700"
                   style={{ width: `${(currentDay / 30) * 100}%` }}
@@ -80,7 +82,7 @@ export function Sidebar({ currentPage, onNavigate, mobileOpen, onMobileClose }: 
         </div>
 
         {/* Nav */}
-        <nav className="flex-1 px-3 py-1 overflow-y-auto scrollbar-thin">
+        <nav className="flex-1 px-3 py-1 overflow-y-auto scrollbar-thin" aria-label="Page navigation">
           {navItems.map((item) => {
             const Icon = item.icon;
             const isActive = currentPage === item.id;
@@ -88,16 +90,19 @@ export function Sidebar({ currentPage, onNavigate, mobileOpen, onMobileClose }: 
               <button
                 key={item.id}
                 onClick={() => onNavigate(item.id)}
-                className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-[13px] font-medium transition-all duration-200 mb-0.5 group relative ${
+                className={`w-full flex items-center gap-3 px-3 py-3 sm:py-2.5 rounded-xl text-[13px] font-medium transition-all duration-200 mb-0.5 group relative ${
                   isActive
                     ? 'bg-lime-400/8 text-lime-400'
                     : 'text-navy-300 hover:text-navy-50 hover:bg-white/[0.03]'
                 }`}
+                aria-current={isActive ? 'page' : undefined}
+                aria-label={item.label}
               >
-                {isActive && <div className="absolute left-0 top-1/2 -translate-y-1/2 w-0.5 h-4 rounded-r-full bg-lime-400" />}
+                {isActive && <div className="absolute left-0 top-1/2 -translate-y-1/2 w-0.5 h-4 rounded-r-full bg-lime-400" aria-hidden="true" />}
                 <Icon
                   size={17}
                   className={`transition-transform ${isActive ? 'scale-105' : 'group-hover:scale-105'}`}
+                  aria-hidden="true"
                 />
                 {item.label}
               </button>
@@ -108,7 +113,7 @@ export function Sidebar({ currentPage, onNavigate, mobileOpen, onMobileClose }: 
         {/* User */}
         <div className="px-3.5 py-4 border-t border-white/[0.06]">
           <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-full bg-gradient-to-br from-lime-300 to-lime-600 flex items-center justify-center text-navy-950 font-bold text-xs">
+            <div className="w-8 h-8 rounded-full bg-gradient-to-br from-lime-300 to-lime-600 flex items-center justify-center text-navy-950 font-bold text-xs" aria-hidden="true">
               {state.userName.charAt(0).toUpperCase()}
             </div>
             <div className="min-w-0 flex-1">

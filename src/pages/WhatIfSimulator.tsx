@@ -1,11 +1,11 @@
 import { useState, useMemo } from 'react';
-import { useFinance } from '@/context/FinanceContext';
+import { useFinance } from '@/context/useFinance';
 import { Card, CardHeader } from '@/components/ui/Card';
 import { ProgressBar } from '@/components/ui/RiskBadge';
 import { AnimatedNumber } from '@/components/ui/AnimatedNumber';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { simulateScenario, formatCurrency, calculateMetrics } from '@/lib/finance';
-import { FlaskConical, TrendingDown, TrendingUp, PiggyBank, Gauge, Zap, RefreshCw } from 'lucide-react';
+import { FlaskConical, TrendingDown, TrendingUp, PiggyBank, Gauge, Zap, RefreshCw, Info } from 'lucide-react';
 
 export function WhatIfSimulator() {
   const { state, currentDay } = useFinance();
@@ -15,7 +15,7 @@ export function WhatIfSimulator() {
   const [additionalIncome, setAdditionalIncome] = useState(0);
   const [extraSavings, setExtraSavings] = useState(0);
 
-  const currentMetrics = calculateMetrics(state, currentDay);
+  const currentMetrics = useMemo(() => calculateMetrics(state, currentDay), [state, currentDay]);
   const simulated = useMemo(() => {
     return simulateScenario(state, currentDay, { spendReduction, additionalIncome, extraSavings });
   }, [state, currentDay, spendReduction, additionalIncome, extraSavings]);
@@ -24,12 +24,12 @@ export function WhatIfSimulator() {
   const healthDiff = simulated.newHealthScore - currentMetrics.healthScore;
   const savingsDiff = simulated.projectedSavings - currentMetrics.totalSavingsCurrent;
 
-  const presets = [
+  const presets = useMemo(() => [
     { name: `Cut 20% spending`, spendReduction: 20, additionalIncome: 0, extraSavings: 0 },
     { name: `Earn ${currency}1,000 extra`, spendReduction: 0, additionalIncome: 1000, extraSavings: 0 },
     { name: `Save ${currency}500 more`, spendReduction: 0, additionalIncome: 0, extraSavings: 500 },
     { name: 'Aggressive saver', spendReduction: 25, additionalIncome: 500, extraSavings: 1000 },
-  ];
+  ], [currency]);
 
   const applyPreset = (preset: typeof presets[0]) => {
     setSpendReduction(preset.spendReduction);
@@ -48,36 +48,53 @@ export function WhatIfSimulator() {
       <PageHeader
         title="What-if Simulator"
         subtitle="See how changes affect your month-end outlook"
-        action={<button onClick={reset} className="btn-secondary"><RefreshCw size={16} /> Reset</button>}
+        action={<button onClick={reset} className="btn-secondary" aria-label="Reset simulator to defaults"><RefreshCw size={16} aria-hidden="true" /> Reset</button>}
       />
 
+      {/* Forecast Explanation */}
+      <Card delay={1} className="p-4 sm:p-5">
+        <div className="flex items-start gap-3">
+          <div className="w-8 h-8 rounded-lg bg-sky-400/10 flex items-center justify-center flex-shrink-0 text-sky-400">
+            <Info size={16} aria-hidden="true" />
+          </div>
+          <div className="min-w-0">
+            <h3 className="text-sm font-semibold text-navy-50 mb-1">How this forecast works</h3>
+            <p className="text-xs text-navy-400 leading-relaxed">
+              This simulator takes your current balance, income, and expenses as a starting point, then applies the adjustments you choose below. It projects your end-of-month balance by factoring in future subscription billing days and unpaid commitments that fall between today and day 30. The health score recalculates using the same formula as the dashboard — spending rate, projected balance, savings progress, and unpaid obligations. <span className="text-navy-300">These are previews only — nothing you do here changes your actual saved data.</span>
+            </p>
+          </div>
+        </div>
+      </Card>
+
       {/* Presets */}
-      <div className="flex flex-wrap gap-2 animate-fade-in">
+      <div className="flex flex-wrap gap-2 animate-fade-in" role="group" aria-label="Quick scenario presets">
         {presets.map((preset) => (
           <button
             key={preset.name}
             onClick={() => applyPreset(preset)}
             className="badge bg-white/[0.03] text-navy-200 border border-white/[0.08] hover:border-lime-400/30 hover:text-lime-400 transition-all cursor-pointer"
+            aria-label={`Apply preset: ${preset.name}`}
           >
-            <Zap size={12} /> {preset.name}
+            <Zap size={12} aria-hidden="true" /> {preset.name}
           </button>
         ))}
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         {/* Controls */}
-        <Card delay={1}>
+        <Card delay={2}>
           <CardHeader title="Simulation Controls" subtitle="Adjust the sliders to see outcomes" icon={<FlaskConical size={16} />} />
           <div className="px-5 pb-5 space-y-6">
             {/* Spend Reduction */}
             <div>
               <div className="flex items-center justify-between mb-2">
-                <label className="text-sm text-navy-200 font-medium flex items-center gap-2">
-                  <TrendingDown size={15} className="text-coral" /> Reduce Spending
+                <label htmlFor="spend-reduction-slider" className="text-sm text-navy-200 font-medium flex items-center gap-2">
+                  <TrendingDown size={15} className="text-coral" aria-hidden="true" /> Reduce Spending
                 </label>
-                <span className="text-sm font-mono font-semibold text-coral">{spendReduction}%</span>
+                <span className="text-sm font-mono font-semibold text-coral" aria-live="polite">{spendReduction}%</span>
               </div>
               <input
+                id="spend-reduction-slider"
                 type="range"
                 min="0"
                 max="50"
@@ -86,6 +103,11 @@ export function WhatIfSimulator() {
                 onChange={(e) => setSpendReduction(parseInt(e.target.value))}
                 className="w-full cursor-pointer"
                 style={{ ['--val' as string]: `${(spendReduction / 50) * 100}%` }}
+                aria-label="Reduce spending percentage"
+                aria-valuemin={0}
+                aria-valuemax={50}
+                aria-valuenow={spendReduction}
+                aria-valuetext={`${spendReduction}% reduction`}
               />
               <p className="text-xs text-navy-400 mt-1">Cut discretionary spending by {spendReduction}%</p>
             </div>
@@ -93,12 +115,13 @@ export function WhatIfSimulator() {
             {/* Additional Income */}
             <div>
               <div className="flex items-center justify-between mb-2">
-                <label className="text-sm text-navy-200 font-medium flex items-center gap-2">
-                  <TrendingUp size={15} className="text-lime-400" /> Extra Income
+                <label htmlFor="extra-income-slider" className="text-sm text-navy-200 font-medium flex items-center gap-2">
+                  <TrendingUp size={15} className="text-lime-400" aria-hidden="true" /> Extra Income
                 </label>
-                <span className="text-sm font-mono font-semibold text-lime-400">{formatCurrency(additionalIncome, currency)}</span>
+                <span className="text-sm font-mono font-semibold text-lime-400" aria-live="polite">{formatCurrency(additionalIncome, currency)}</span>
               </div>
               <input
+                id="extra-income-slider"
                 type="range"
                 min="0"
                 max="5000"
@@ -107,6 +130,11 @@ export function WhatIfSimulator() {
                 onChange={(e) => setAdditionalIncome(parseInt(e.target.value))}
                 className="w-full cursor-pointer"
                 style={{ ['--val' as string]: `${(additionalIncome / 5000) * 100}%` }}
+                aria-label="Additional income amount"
+                aria-valuemin={0}
+                aria-valuemax={5000}
+                aria-valuenow={additionalIncome}
+                aria-valuetext={formatCurrency(additionalIncome, currency)}
               />
               <p className="text-xs text-navy-400 mt-1">Additional income this month</p>
             </div>
@@ -114,12 +142,13 @@ export function WhatIfSimulator() {
             {/* Extra Savings */}
             <div>
               <div className="flex items-center justify-between mb-2">
-                <label className="text-sm text-navy-200 font-medium flex items-center gap-2">
-                  <PiggyBank size={15} className="text-accent-blue" /> Extra Savings
+                <label htmlFor="extra-savings-slider" className="text-sm text-navy-200 font-medium flex items-center gap-2">
+                  <PiggyBank size={15} className="text-accent-blue" aria-hidden="true" /> Extra Savings
                 </label>
-                <span className="text-sm font-mono font-semibold text-accent-blue">{formatCurrency(extraSavings, currency)}</span>
+                <span className="text-sm font-mono font-semibold text-accent-blue" aria-live="polite">{formatCurrency(extraSavings, currency)}</span>
               </div>
               <input
+                id="extra-savings-slider"
                 type="range"
                 min="0"
                 max="3000"
@@ -128,6 +157,11 @@ export function WhatIfSimulator() {
                 onChange={(e) => setExtraSavings(parseInt(e.target.value))}
                 className="w-full cursor-pointer"
                 style={{ ['--val' as string]: `${(extraSavings / 3000) * 100}%` }}
+                aria-label="Extra savings amount"
+                aria-valuemin={0}
+                aria-valuemax={3000}
+                aria-valuenow={extraSavings}
+                aria-valuetext={formatCurrency(extraSavings, currency)}
               />
               <p className="text-xs text-navy-400 mt-1">Move extra money to savings goals</p>
             </div>
@@ -135,7 +169,7 @@ export function WhatIfSimulator() {
         </Card>
 
         {/* Results */}
-        <Card delay={2}>
+        <Card delay={3}>
           <CardHeader title="Projected Outcome" subtitle="After applying your changes" icon={<Gauge size={16} />} />
           <div className="px-5 pb-5 space-y-3">
             {/* Balance Comparison */}
@@ -209,12 +243,12 @@ export function WhatIfSimulator() {
       </div>
 
       {/* Impact Summary */}
-      <Card delay={3} className="p-5">
+      <Card delay={4} className="p-5">
         <h3 className="text-sm font-semibold text-navy-50 mb-4">Impact Summary</h3>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           <div className="flex items-start gap-3">
             <div className={`w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0 ${balanceDiff >= 0 ? 'bg-lime-400/10 text-lime-400' : 'bg-red-400/10 text-red-400'}`}>
-              {balanceDiff >= 0 ? <TrendingUp size={18} /> : <TrendingDown size={18} />}
+              {balanceDiff >= 0 ? <TrendingUp size={18} aria-hidden="true" /> : <TrendingDown size={18} aria-hidden="true" />}
             </div>
             <div>
               <p className="text-xs text-navy-400">Balance Impact</p>
@@ -225,7 +259,7 @@ export function WhatIfSimulator() {
           </div>
           <div className="flex items-start gap-3">
             <div className={`w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0 ${healthDiff >= 0 ? 'bg-lime-400/10 text-lime-400' : 'bg-red-400/10 text-red-400'}`}>
-              <Gauge size={18} />
+              <Gauge size={18} aria-hidden="true" />
             </div>
             <div>
               <p className="text-xs text-navy-400">Health Impact</p>
@@ -236,7 +270,7 @@ export function WhatIfSimulator() {
           </div>
           <div className="flex items-start gap-3">
             <div className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0 bg-accent-blue/10 text-accent-blue">
-              <PiggyBank size={18} />
+              <PiggyBank size={18} aria-hidden="true" />
             </div>
             <div>
               <p className="text-xs text-navy-400">Savings Impact</p>

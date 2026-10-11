@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useFinance } from '@/context/FinanceContext';
+import { useFinance } from '@/context/useFinance';
 import { Card } from '@/components/ui/Card';
 import { Modal } from '@/components/ui/Modal';
 import { ProgressBar } from '@/components/ui/RiskBadge';
@@ -8,8 +8,8 @@ import { PageHeader } from '@/components/ui/PageHeader';
 import { formatCurrency } from '@/lib/finance';
 import { getIcon } from '@/lib/icons';
 import { SavingsGoal } from '@/types';
-import { Plus, Trash2, Edit, Target, Check } from 'lucide-react';
-import { LucideIcon } from 'lucide-react';
+import { Plus, Trash2, CreditCard as Edit, Target, Check } from 'lucide-react';
+import type { LucideIcon } from 'lucide-react';
 import { ConfirmDialog } from '@/components/ui/ConfirmDialog';
 
 const goalColors = ['#84cc16', '#38bdf8', '#a78bfa', '#fbbf24', '#2dd4bf', '#fb7185'];

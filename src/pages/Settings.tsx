@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useFinance } from '@/context/FinanceContext';
+import { useFinance } from '@/context/useFinance';
 import { Card, CardHeader } from '@/components/ui/Card';
 import { Modal } from '@/components/ui/Modal';
 import { PageHeader } from '@/components/ui/PageHeader';

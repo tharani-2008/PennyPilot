@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useFinance } from '@/context/FinanceContext';
+import { useFinance } from '@/context/useFinance';
 import { Card } from '@/components/ui/Card';
 import { Modal } from '@/components/ui/Modal';
 import { ProgressBar } from '@/components/ui/RiskBadge';
@@ -7,7 +7,7 @@ import { EmptyState } from '@/components/ui/EmptyState';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { formatCurrency } from '@/lib/finance';
 import { CATEGORY_META, Category, CATEGORIES, Budget } from '@/types';
-import { Plus, Trash2, Edit, PiggyBank, AlertCircle } from 'lucide-react';
+import { Plus, Trash2, CreditCard as Edit, PiggyBank, CircleAlert as AlertCircle } from 'lucide-react';
 import { ConfirmDialog } from '@/components/ui/ConfirmDialog';
 
 export function Budgets() {

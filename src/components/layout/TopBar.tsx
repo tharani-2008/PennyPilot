@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { Menu, Bell } from 'lucide-react';
-import { useFinance } from '@/context/FinanceContext';
+import { useFinance } from '@/context/useFinance';
 import { RiskBadge } from '@/components/ui/RiskBadge';
 import { NotificationPanel } from '@/components/ui/NotificationPanel';
 import { formatCurrency } from '@/lib/finance';
@@ -32,9 +32,10 @@ export function TopBar({ onMobileMenuClick }: TopBarProps) {
           <div className="flex items-center gap-3">
             <button
               onClick={onMobileMenuClick}
-              className="lg:hidden w-8 h-8 rounded-lg flex items-center justify-center text-navy-300 hover:bg-white/[0.05] transition-all"
+              className="lg:hidden w-9 h-9 rounded-lg flex items-center justify-center text-navy-300 hover:bg-white/[0.05] transition-all"
+              aria-label="Open navigation menu"
             >
-              <Menu size={18} />
+              <Menu size={18} aria-hidden="true" />
             </button>
             <div className="hidden sm:block">
               <p className="text-[11px] text-navy-400 font-medium">Welcome back,</p>
@@ -55,14 +56,16 @@ export function TopBar({ onMobileMenuClick }: TopBarProps) {
             <button
               ref={bellRef}
               onClick={() => setNotifOpen((v) => !v)}
-              className={`relative w-8 h-8 rounded-lg flex items-center justify-center transition-all ${
+              className={`relative w-9 h-9 rounded-lg flex items-center justify-center transition-all ${
                 notifOpen ? 'bg-lime-400/10 text-lime-400' : 'text-navy-300 hover:bg-white/[0.05]'
               }`}
-              aria-label="Toggle notifications"
+              aria-label={notifOpen ? 'Close notifications' : 'Open notifications'}
+              aria-expanded={notifOpen}
+              aria-haspopup="dialog"
             >
-              <Bell size={17} />
+              <Bell size={17} aria-hidden="true" />
               {warningCount > 0 && (
-                <span className="absolute top-0.5 right-0.5 min-w-[14px] h-3.5 px-1 rounded-full bg-coral text-navy-950 text-[8px] font-bold flex items-center justify-center">
+                <span className="absolute top-0.5 right-0.5 min-w-[16px] h-4 px-1 rounded-full bg-coral text-navy-950 text-[9px] font-bold flex items-center justify-center" aria-label={`${warningCount} unread alerts`}>
                   {warningCount}
                 </span>
               )}
